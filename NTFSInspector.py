@@ -89,7 +89,7 @@ if __name__ == '__main__':
     else:
         partitions = get_partitions()
     selected_partition = tk.StringVar()
-    selected_partition.set(partitions[0])
+    #selected_partition.set(partitions[0])
     dropdown = tk.OptionMenu(root, selected_partition, *partitions, command=on_select)
     #dropdown.pack()
     dropdown.grid(row=1, column=0)

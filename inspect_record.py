@@ -291,28 +291,30 @@ def fixupArray(mftrec, buf):
     return struct.unpack(f'<{mftrec.numEntriesInFixupArray}H', buf[mftrec.updateSequenceOffset : mftrec.updateSequenceOffset + mftrec.numEntriesInFixupArray * 2]) # 2 = sizeof(uint16_t)
 
 def updateSequenceNumber(mftrec, buf):
-    return struct.unpack('<H', buf[mftrec.updateSequenceOffset : mftrec.updateSequenceOffset + 2])
+    return struct.unpack('<H', buf[mftrec.updateSequenceOffset : mftrec.updateSequenceOffset + 2])[0]
 
 def applyFixup(mftrec, buf, bytesPerSector):
     arr = fixupArray(mftrec, buf)
     sectorIterator = 0 + bytesPerSector - 2 # 2 = sizeof(uint16_t)
     usn = updateSequenceNumber(mftrec, buf)
+    outBuf = bytearray(buf) # https://stackoverflow.com/questions/66984217/change-byte-array-buffer-with-python
     for val in arr:
         if sectorIterator > mftrec.usedSizeOfMFTEntry:
             #print("applyFixup: sectorIterator is past usedSizeOfMFTEntry")
             break
 
         valPtr = sectorIterator
-        print(f"applyFixup: {buf[valPtr]} should be usn {usn}");
-        assert(buf[valPtr] == usn);
-        print(f"  {buf[valPtr]} -> {val}");
-        buf[valPtr] = val
+        toCheck = struct.unpack('<H', buf[valPtr:valPtr+2])[0]
+        print(f"applyFixup: {toCheck} should be usn {usn}");
+        assert(toCheck == usn);
+        print(f"  {toCheck} -> {val}");
+        outBuf[valPtr:valPtr+2] = struct.pack('<H', val)
         sectorIterator += bytesPerSector
 
     # Re-unpack
-    mftrec = mftRecord_._make(struct.unpack(mftRecord, buf))
+    mftrec = mftRecord_._make(struct.unpack(mftRecord, outBuf))
     
-    return mftrec, buf
+    return mftrec, outBuf
 
 def numAttributes(mftrec, buf):
     retval = mftrec.nextAttributeID - 1
