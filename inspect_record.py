@@ -295,13 +295,14 @@ def updateSequenceNumber(mftrec, buf):
 
 def applyFixup(mftrec, buf, bytesPerSector):
     arr = fixupArray(mftrec, buf)
+    arr = arr[1:] # the fixup array comes after the update sequence number (USN) which is the first element of this array
     sectorIterator = 0 + bytesPerSector - 2 # 2 = sizeof(uint16_t)
     usn = updateSequenceNumber(mftrec, buf)
     outBuf = bytearray(buf) # https://stackoverflow.com/questions/66984217/change-byte-array-buffer-with-python
     for val in arr:
-        if sectorIterator > mftrec.usedSizeOfMFTEntry:
-            #print("applyFixup: sectorIterator is past usedSizeOfMFTEntry")
-            break
+        # if sectorIterator > mftrec.usedSizeOfMFTEntry:
+        #     #print("applyFixup: sectorIterator is past usedSizeOfMFTEntry")
+        #     break
 
         valPtr = sectorIterator
         toCheck = struct.unpack('<H', buf[valPtr:valPtr+2])[0]
