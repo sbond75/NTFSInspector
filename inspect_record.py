@@ -427,13 +427,13 @@ def processVolume(volumePath):
 
         #attributeBase_._make(struct.unpack(
 
-        print(map(lambda x: x[0], attributes(firstrec, firstbytes)))
+        print(list(map(lambda x: x[0], attributes(firstrec, firstbytes))))
 
         volinforec, volinforecbytes = getMFTRecord(f, 3 # volume information
                                   , header)
         volinfoattrs = attributes(volinforec, volinforecbytes)
         #hexdump(volinforecbytes)
-        print(map(lambda x: x[0], volinfoattrs))
+        print(list(map(lambda x: x[0], volinfoattrs)))
 
         for x in volinfoattrs:
             attr, buf = x
