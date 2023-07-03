@@ -1,0 +1,3 @@
+[submodule "python-ntfs"]
+	path = python-ntfs
+	url = git@github.com:sbond75/python-ntfs.git
